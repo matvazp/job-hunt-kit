@@ -78,6 +78,51 @@ The template's `.gitignore` keeps your personal folders (`profile/`, `postings/`
 `applications/`, `search/`, `job-hunt.yaml`) out of git by default. If your repo is private and you
 want them backed up, delete those lines.
 
+## Daily use
+
+Open Claude Code in your job-search folder. You can type the commands below, or just ask in
+plain words ("find me new jobs", "tailor my CV for this link") and Claude picks the right skill.
+
+**1. Find: `/job-hunt-kit:job-scout`.** Runs about 30 searches built from your search
+parameters. It keeps only postings published in the last 30 days that it can confirm are still
+open, skips anything you've already collected, and sorts the rest into tiers. The URLs go under
+today's date in `postings/job-postings-list.md`. What it searched, kept and dropped, with
+reasons, goes in `postings/scouting-log.md`. You can narrow a run: "just Germany today", "go
+back 60 days", "only company career pages".
+
+**2. Score: `/job-hunt-kit:fit-check`.** Reads every posting under today's date and scores it
+1–10 against your master CV. 60% of the score is requirements met, 40% is day-to-day tasks
+you've actually done. It adds a comparison table and a **Shortlist** of 3–5 picks to the same
+file. Read it and decide where to apply.
+
+**3. Tailor: `/job-hunt-kit:cv-tailor`.** Give it your picks ("tailor for 2, 4 and 5 from
+today's shortlist") or paste links. Each posting gets its own
+`applications/YYYYMMDD - Company - Position/` folder:
+
+- `… - CV.pdf`: two pages, ordered so the posting's must-haves come first, with the
+  work-eligibility line set for that country.
+- `… - CL.pdf`: a one-page cover letter.
+- `vacancy.md`: the fit assessment, the gaps, and the job description copied word for word,
+  so you still have it if the ad is taken down.
+
+Review the PDFs, then apply.
+
+**Shortcuts**
+
+- **Skip the scout.** If someone sends you a job link, paste it with "tailor my CV for this"
+  and you go straight to step 3.
+- **Login-gated ads.** If a posting can't be fetched, Claude asks you to paste the text.
+- **Edits.** The `.tex` files stay in the application folder, so you can ask "make the profile
+  shorter" or "lead with the IoT role" and the PDFs are rebuilt.
+
+**Keeping it working well**
+
+- **Keep adding to your master CV.** Tailoring only selects and rewords what's in it, never
+  adds to it. When a skill flags a gap you can actually fill ("I did use Zephyr, at my last
+  job"), add it to `profile/master-cv.md`, and every later application benefits.
+- **Changed what you're looking for?** Run `/job-hunt-kit:setup` again. It updates only the
+  parts you pick and regenerates your search queries.
+
 ## Your workspace
 
 ```
