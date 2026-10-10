@@ -1,0 +1,59 @@
+# job-hunt.yaml — the one settings file every job-hunt-kit skill reads.
+# Its presence marks the workspace root.
+# Run /job-hunt-kit:setup to fill it in by interview, or edit it by hand.
+# All paths below are relative to the folder holding this file.
+
+identity:
+  name: "Your Name"                  # as it should appear on the CV header
+  name_with_title: "Your Name"       # e.g. "Your Name, Ph.D." — used on the CV header
+  location: "City, CC"               # short form for the CV header, e.g. "Utrecht, NL"
+  home_city: "City, Country"         # used to judge commuting range
+  phone: "+00 000 000 000"
+  email: "you@example.com"
+  website:                           # optional — delete the block if none
+    label: "example.com"
+    url: "https://example.com"
+  linkedin:                          # optional
+    label: "linkedin.com/in/you"
+    url: "https://www.linkedin.com/in/you/"
+  photo: null                        # e.g. "profile/headshot.jpg" (square). null = no photo
+
+work_eligibility:
+  citizenship: "Portuguese"          # adjective form; null to leave it off the CV
+  eligible_countries:                # countries you can work in without a new permit
+    - Portugal
+    - Netherlands
+  permit_note: "work permit required"  # shown for other countries; null for none
+
+languages:                           # level as you'd write it on a CV
+  - { language: English, level: Fluent }
+  - { language: Portuguese, level: Native }
+
+# Portfolio pages cover letters may link to (exactly one per letter, chosen by role type).
+portfolio_pages: []
+#  - url: "https://example.com/projects"
+#    label: "example.com/projects"
+#    use_for: "hardware, product and engineering roles"
+
+job_search:
+  freshness_days: 30                 # job-scout only keeps postings newer than this
+  queries_per_run: 30                # job-scout picks this many from the query matrix
+
+paths:
+  master_cv: profile/master-cv.md
+  contributions: profile/contributions.md          # optional; delete line if unused
+  search_parameters: profile/search-parameters.md
+  query_matrix: search/query-matrix.md
+  target_companies: search/target-companies.md
+  postings_list: postings/job-postings-list.md
+  scouting_log: postings/scouting-log.md
+  applications: applications                       # one folder per application
+  latex_override: latex                            # optional: put a custom jobcv.sty here
+
+documents:
+  paper: a4paper                     # a4paper or letterpaper
+  cv_pages: 2
+  cv_word_budget: [550, 600]
+  cover_letter_words: [300, 380]
+  sign_off: "Kind regards,"
+  date_city: "City"                  # cover letter date line: "City, 10 October 2026"

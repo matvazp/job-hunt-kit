@@ -1,0 +1,13 @@
+{
+  "name": "job-hunt-kit",
+  "displayName": "Job Hunt Kit",
+  "description": "A job-search pipeline for Claude Code: scout live vacancies, score them against your master CV, and tailor ATS-safe LaTeX CVs and cover letters without inventing anything.",
+  "author": {
+    "name": "Matías Vázquez-Piñón",
+    "url": "https://github.com/matvazp"
+  },
+  "homepage": "https://github.com/matvazp/job-hunt-kit",
+  "repository": "https://github.com/matvazp/job-hunt-kit",
+  "license": "MIT",
+  "keywords": ["job-search", "cv", "resume", "cover-letter", "latex", "ats", "career"]
+}

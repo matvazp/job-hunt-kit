@@ -1,0 +1,367 @@
+% =====================================================================
+%  jobcv.sty — shared style for the job-hunt-kit CV and cover letter
+%
+%  Design rules:
+%    · Two colours: navy (structure) and black (body). White is paper.
+%      A third, linkblue, is used only for hyperlinks in running text.
+%    · Strongest material first; the body is a single column that flows
+%      across pages.
+%    · The PDF text layer must extract cleanly for ATS parsers.
+%
+%  Compile with pdflatex (twice, for the page counter). See README.md.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jobcv}[2026/10/10 v2.0 Navy CV and cover letter style]
+
+% ---------------------------------------------------------------- page
+\RequirePackage[top=22mm, bottom=12mm, left=15mm, right=15mm,
+                headheight=14pt, headsep=5mm, footskip=9mm]{geometry}
+% Paper size comes from \documentclass (a4paper or letterpaper).
+% `top` is measured to the top of the BODY; fancyhdr's running head sits above
+% it, inside the margin, at (top - headsep - headheight) from the paper edge.
+% top=22mm puts the page-2 head ~12mm down. Page-1 text position is set by
+% \headerpush below; the two are coupled — see README "Known quirks".
+
+% ------------------------------------------------------------- encoding
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[default,scale=0.98]{sourcesanspro}
+% Protrusion improves the right margin; expansion is switched OFF because
+% it shifts glyph positions enough that text extractors split words
+% ("LTspice" -> "L Tspice"), which costs ATS keyword matches.
+\RequirePackage[protrusion=true, expansion=false]{microtype}
+% Allows arbitrary font sizes without size-substitution warnings.
+\RequirePackage{anyfontsize}
+
+% =====================================================================
+%  ATS: hyphenation exceptions
+%
+%  LaTeX hyphenates across line breaks, and the break survives into the
+%  PDF text layer as "Or-\nCAD". An ATS keyword matcher that does not
+%  de-hyphenate then fails to match "OrCAD" at all.
+%
+%  Listing a word here removes its hyphenation points. Keep the list to
+%  proper nouns and tool names: adding ordinary prose words starves the
+%  line breaker and produces overfull hboxes. Add your own tool names
+%  with \hyphenation{...} in the document preamble, or extend this list.
+% =====================================================================
+\hyphenation{OrCAD KiCad Altium Cadence EAGLE LTspice PSpice HSPICE
+  SystemVerilog Verilog VHDL UVM LabVIEW MATLAB Simulink COMSOL
+  Python Arduino Keithley JavaScript TypeScript PostgreSQL Kubernetes
+  Terraform SolidWorks AutoCAD Tableau PowerBI Salesforce}
+
+% ---------------------------------------------------------------- tools
+\RequirePackage{xcolor}
+\RequirePackage{multicol}
+\RequirePackage{tikz}
+\RequirePackage{enumitem}
+\RequirePackage{fancyhdr}
+\RequirePackage{lastpage}
+\RequirePackage{graphicx}
+\RequirePackage{ragged2e}
+\RequirePackage{needspace}
+% csquotes: \enquote{} in the cover letters. Without it the macro is undefined
+% and pdflatex still writes a PDF — with the quotation marks silently missing.
+\RequirePackage{csquotes}
+\RequirePackage[hidelinks]{hyperref}
+
+% =====================================================================
+%  ATS: emit a ToUnicode CMap so ligatures (fi, fl, ff) extract as real
+%  letters. Without this, "Profile" can extract as "Pro le".
+% =====================================================================
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+% =====================================================================
+%  Colours
+% =====================================================================
+\definecolor{navy}{HTML}{0D2D5A}   % primary
+\definecolor{ink}{HTML}{000000}    % secondary
+% Body links only — navy lifted toward a mid blue. Never applied to the header
+% contact line: those links sit in a white-on-navy TikZ node.
+\definecolor{linkblue}{HTML}{2A5699}
+
+% =====================================================================
+%  Identity — set these in the document preamble
+% =====================================================================
+\newcommand{\@cvname}{Your Name}
+\newcommand{\@cvtitle}{Target Job Title}
+\newcommand{\@cvlocation}{City, Country}
+\newcommand{\@cvphone}{+00 0000 0000}
+\newcommand{\@cvemail}{you@example.com}
+\newcommand{\@cvsite}{}
+\newcommand{\@cvsitelink}{}
+\newcommand{\@cvlinkedin}{}
+\newcommand{\@cvlinkedinlink}{}
+\newcommand{\@cvphoto}{headshot.jpg}
+
+\newcommand{\cvname}[1]{\renewcommand{\@cvname}{#1}}
+\newcommand{\cvtitle}[1]{\renewcommand{\@cvtitle}{#1}}
+\newcommand{\cvlocation}[1]{\renewcommand{\@cvlocation}{#1}}
+\newcommand{\cvphone}[1]{\renewcommand{\@cvphone}{#1}}
+\newcommand{\cvemail}[1]{\renewcommand{\@cvemail}{#1}}
+\newcommand{\cvsite}[2]{\renewcommand{\@cvsite}{#1}\renewcommand{\@cvsitelink}{#2}}
+\newcommand{\cvlinkedin}[2]{\renewcommand{\@cvlinkedin}{#1}\renewcommand{\@cvlinkedinlink}{#2}}
+
+% Photo is OFF by default. \cvphoto{file} turns it on. Use a square image.
+\newif\if@cvshowphoto \@cvshowphotofalse
+\newcommand{\cvphoto}[1]{\renewcommand{\@cvphoto}{#1}\@cvshowphototrue}
+\newcommand{\cvnophoto}{\@cvshowphotofalse}
+
+% ---------------------------------------------------------------------
+% Work-eligibility line for "At a Glance":
+%   \cvcitizenship{Portuguese}                 optional
+%   \cveligiblein{Portugal, Netherlands, ...}  countries you may work in
+%   \cvcountry{Spain}                          REQUIRED per posting
+%   \cvpermitnote{work permit required}        optional, shown when not eligible
+%   \permitline                                renders the sentence
+%
+% WHY THIS IS A MACRO AND NOT TEXT. A hand-typed eligibility line ("Eligible
+% to work in Denmark") is right for one country and confidently wrong for every
+% other, and a wrong-but-plausible line survives proofreading. So the posting's
+% country is a required input and \permitline refuses to typeset without it:
+% the build FAILS rather than producing a CV with the wrong country on it.
+%
+%   eligible:      "Portuguese citizen, eligible to work in Spain"
+%   not eligible:  "Portuguese citizen, open to relocation to Spain (work permit required)"
+%   no citizenship given: "Eligible to work in Spain" / "Open to relocation to Spain"
+% ---------------------------------------------------------------------
+\def\@cvcountry{}
+\def\@cvcitizenship{}
+\def\@cvpermitnote{}
+\newif\if@cvcountryset \@cvcountrysetfalse
+\newcommand{\cvcountry}[1]{\def\@cvcountry{#1}\@cvcountrysettrue}
+\newcommand{\cvcitizenship}[1]{\def\@cvcitizenship{#1}}
+\newcommand{\cvpermitnote}[1]{\def\@cvpermitnote{#1}}
+
+\ExplSyntaxOn
+\clist_new:N \g__jobcv_eligible_clist
+\NewDocumentCommand{\cveligiblein}{m}{ \clist_gset:Nn \g__jobcv_eligible_clist {#1} }
+\prg_generate_conditional_variant:Nnn \clist_if_in:Nn { NV } { TF }
+\NewDocumentCommand{\@cvifeligible}{mm}
+  { \clist_if_in:NVTF \g__jobcv_eligible_clist \@cvcountry {#1} {#2} }
+\ExplSyntaxOff
+
+\newcommand{\permitline}{%
+  \if@cvcountryset\else
+    \PackageError{jobcv}{\string\cvcountry\space not set}%
+      {The At a Glance work-eligibility line must name the country of this
+       posting.^^JAdd \string\cvcountry{<country>} to the preamble, next to
+       \string\cvtitle, e.g. \string\cvcountry{Spain}.}%
+  \fi
+  \ifx\@cvcitizenship\@empty
+    \@cvifeligible{Eligible to work in \@cvcountry}%
+                  {Open to relocation to \@cvcountry\@cvpermitnotesuffix}%
+  \else
+    \@cvifeligible{\@cvcitizenship\ citizen, eligible to work in \@cvcountry}%
+                  {\@cvcitizenship\ citizen, open to relocation to
+                   \@cvcountry\@cvpermitnotesuffix}%
+  \fi}
+\newcommand{\@cvpermitnotesuffix}{%
+  \ifx\@cvpermitnote\@empty\else\ (\@cvpermitnote)\fi}
+
+% =====================================================================
+%  Header band
+% =====================================================================
+\newlength{\bandheight}\setlength{\bandheight}{32mm}
+% Space that pushes body text clear of the band. Keep in step with the
+% geometry top margin:  \headerpush = \bandheight - top + 7mm  (32 - 22 + 7).
+\newlength{\headerpush}\setlength{\headerpush}{17mm}
+
+% Circular headshot. Must be typeset into a box BEFORE the header's overlay
+% picture (see \makecvheader): a tikzpicture nested inside a
+% [remember picture, overlay] picture inherits `overlay`, which suppresses
+% its size computation and mis-places the image.
+\newcommand{\roundphoto}[2]{% #1 = file, #2 = diameter
+  \begin{tikzpicture}
+    \node[circle, draw=white, line width=1pt,
+          minimum size=#2, inner sep=0pt,
+          path picture={%
+            \node at (path picture bounding box.center)
+              {\includegraphics[width=#2]{#1}};}] {};
+  \end{tikzpicture}}
+
+\newsavebox{\@photobox}
+
+% Contact line. Plain text with middle-dot separators — no icon glyphs, so
+% nothing decorative lands in the extracted text. Site and LinkedIn are
+% omitted when not set.
+\newcommand{\@contactline}{%
+  \@cvlocation\ \textperiodcentered\ \@cvphone\ \textperiodcentered\
+  \href{mailto:\@cvemail}{\@cvemail}%
+  \ifx\@cvsite\@empty\else\ \textperiodcentered\ \href{\@cvsitelink}{\@cvsite}\fi
+  \ifx\@cvlinkedin\@empty\else\ \textperiodcentered\ \href{\@cvlinkedinlink}{\@cvlinkedin}\fi}
+
+\newcommand{\makecvheader}{%
+  \hypersetup{pdftitle={\@cvname\ --- \@cvtitle},
+              pdfauthor={\@cvname},
+              pdfsubject={\@cvtitle},
+              pdfcreator={pdflatex}}%
+  \if@cvshowphoto\sbox{\@photobox}{\roundphoto{\@cvphoto}{21mm}}\fi%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[navy] (current page.north west)
+      rectangle ([yshift=-\bandheight]current page.north east);
+    \node[anchor=north west, inner sep=0pt, text=white]
+      at ([xshift=15mm, yshift=-8mm]current page.north west)
+      {\fontsize{20}{23}\selectfont\bfseries\@cvname};
+    % No letterspacing: the job title is the highest-value ATS keyword in
+    % the document and \textls makes it extract as "E N G I N E E R".
+    \node[anchor=north west, inner sep=0pt, text=white]
+      at ([xshift=15mm, yshift=-17mm]current page.north west)
+      {\fontsize{11.5}{14}\selectfont\MakeUppercase{\@cvtitle}};
+    \node[anchor=north west, inner sep=0pt, text=white]
+      at ([xshift=15mm, yshift=-24.2mm]current page.north west)
+      {\fontsize{8.6}{11}\selectfont\@contactline};
+    \if@cvshowphoto
+      \node[anchor=north east, inner sep=0pt]
+        at ([xshift=-15mm, yshift=-5.5mm]current page.north east)
+        {\usebox{\@photobox}};
+    \fi
+  \end{tikzpicture}%
+  \vspace*{\headerpush}\par\noindent%
+}
+
+% =====================================================================
+%  Page styles
+% =====================================================================
+\newcommand{\@pagefoot}{%
+  \footnotesize\color{navy}\thepage\,/\,\pageref{LastPage}}
+
+\fancypagestyle{cvfirst}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \fancyfoot[R]{\@pagefoot}}
+
+\fancypagestyle{cvrest}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\headrule}{{\color{navy}\hrule height 0.6pt}}%
+  \fancyhead[L]{\footnotesize\color{navy}\bfseries\@cvname}%
+  \fancyhead[R]{\footnotesize\color{navy}\@cvtitle}%
+  \fancyfoot[R]{\@pagefoot}}
+
+% =====================================================================
+%  Section headings — no letterspacing: ATS parsers use these labels to
+%  segment the document, so "EDUCATION" must extract as one word.
+% =====================================================================
+\newcommand{\cvsection}[1]{%
+  \par\addvspace{3.4mm}%
+  \needspace{12mm}%
+  {\color{navy}\bfseries\fontsize{12.6}{15}\selectfont\MakeUppercase{#1}}%
+  \par\vspace{1.1mm}%
+  {\color{navy}\hrule height 1pt}%
+  \par\vspace{2.4mm}%
+}
+
+% =====================================================================
+%  Content blocks
+% =====================================================================
+% The "\ " before every \hfill below: \hfill is glue, which leaves no
+% character in the PDF text stream, so extractors run the two sides
+% together ("...CA, USA2014 - 2015"). An explicit space fixes that.
+
+% \cventry{Role}{Organisation, Location}{Dates}
+\newcommand{\cventry}[3]{%
+  \par\addvspace{2.6mm}%
+  \needspace{16mm}%
+  {\bfseries\fontsize{12.4}{14.9}\selectfont #1}\par\vspace{0.4mm}%
+  \noindent{\color{navy}\fontsize{11.2}{13.4}\selectfont #2}%
+  \ \hfill{\fontsize{10.4}{12.6}\selectfont\itshape #3}\par\vspace{1mm}%
+}
+
+% \skillgroup{Label}{Content}
+% The em dash is a real glyph, so label and content can never be run together
+% by a text extractor ("Hardware design:Analog...").
+\newcommand{\skillgroup}[2]{%
+  \par\addvspace{1.5mm}%
+  \noindent{\color{navy}\bfseries #1} --- #2\par%
+}
+
+% \quality{Short phrase} — one per line, navy marker
+\newcommand{\quality}[1]{%
+  \par\addvspace{1.1mm}%
+  \noindent\hangindent=5mm\hangafter=1
+  {\color{navy}\rule[0.28ex]{1.6mm}{1.6pt}}\hspace{1.6mm}#1\par%
+}
+
+% Tight bullet lists. The marker is a drawn rule, not a glyph: it
+% contributes nothing to the extracted text layer.
+\newcommand{\cvmarker}{{\color{navy}\rule[0.28ex]{1.6mm}{1.6pt}}}
+\setlist[itemize]{leftmargin=4.6mm, itemsep=1mm, topsep=1mm, parsep=0pt,
+                  label=\cvmarker}
+\newenvironment{cvbullets}
+  {\begin{itemize}[leftmargin=4.6mm, itemsep=0.9mm, topsep=0.8mm, parsep=0pt,
+                   label=\cvmarker]}
+  {\end{itemize}}
+
+% Single-column body: one reading order by construction, which is the
+% safest structure for the weakest ATS parsers.
+\RaggedRight
+
+% \compactcols{n}{content} — n balanced columns for short one-line items.
+\newenvironment{compactcolsenv}[1]
+  {\setlength{\multicolsep}{1.2mm}\setlength{\columnsep}{6mm}%
+   \begin{multicols}{#1}}
+  {\end{multicols}}
+\newcommand{\compactcols}[2]{%
+  \begin{compactcolsenv}{#1}#2\end{compactcolsenv}}
+
+% \eduentrywide{Degree}{Institution}{Years}
+\newcommand{\eduentrywide}[3]{%
+  \par\addvspace{2.2mm}%
+  \noindent{\bfseries #1}%
+  \ \hfill{\itshape\fontsize{10.4}{12.6}\selectfont #3}\par\vspace{0.3mm}%
+  \noindent{\color{navy}\fontsize{9.3}{11.2}\selectfont #2}\par%
+}
+
+% \langline{content} — languages on one line, middle-dot separated.
+\newcommand{\langline}[1]{\par\addvspace{1mm}\noindent #1\par}
+
+% =====================================================================
+%  Cover letter blocks
+% =====================================================================
+\newcommand{\clrecipient}[1]{%
+  \par\addvspace{2mm}\noindent{\fontsize{11.5}{15}\selectfont #1}%
+  \par\addvspace{5mm}}
+
+\newcommand{\cldate}[1]{%
+  \par\noindent{\color{navy}\fontsize{10.8}{13.2}\selectfont #1}\par\addvspace{4mm}}
+
+\newcommand{\clsubject}[1]{%
+  \par\addvspace{1mm}%
+  {\color{navy}\bfseries\fontsize{14.4}{17.4}\selectfont #1}%
+  \par\vspace{1.4mm}{\color{navy}\hrule height 1pt}\par\addvspace{4mm}}
+
+\newcommand{\clsalutation}[1]{\par\noindent #1\par\addvspace{2.5mm}}
+
+\newenvironment{clbody}
+  {\setlength{\parskip}{3mm}\setlength{\parindent}{0pt}\justifying}
+  {\par}
+
+% Body hyperlink. hyperref runs with `hidelinks`, so link colour is applied
+% here and nowhere else — which keeps it out of the white-on-navy header.
+% Use this for every link in running text instead of a bare \href.
+\newcommand{\weblink}[2]{\href{#1}{\textcolor{linkblue}{#2}}}
+
+% Signature contact block under the signed name, fed from the identity
+% macros so it cannot drift out of sync with the header. Do not add contact
+% details by hand under the name or they will appear twice.
+\newcommand{\clsignature}{%
+  \par\addvspace{1.6mm}%
+  {\fontsize{10.3}{13.2}\selectfont
+   \ifx\@cvsite\@empty\else\weblink{\@cvsitelink}{\@cvsite}\ \textperiodcentered\ \fi
+   \weblink{mailto:\@cvemail}{\@cvemail}\ \textperiodcentered\
+   \@cvphone\par}}
+
+\newcommand{\clclosing}[2]{% #1 = sign-off, #2 = name
+  \par\addvspace{4.5mm}\noindent #1\par\addvspace{3.5mm}%
+  \noindent{\bfseries\color{navy}#2}%
+  \clsignature}
+
+% Body text defaults: 12pt base (set in \documentclass) with 1.15 leading.
+% If a document runs long, cut content — do not shrink type or leading.
+\setlength{\parindent}{0pt}
+\renewcommand{\baselinestretch}{1.15}
+\color{ink}
+
+\endinput

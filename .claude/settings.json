@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "job-hunt-kit": {
+      "source": {
+        "source": "github",
+        "repo": "matvazp/job-hunt-kit"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "job-hunt-kit@job-hunt-kit": true
+  }
+}

@@ -1,0 +1,14 @@
+# LaTeX build artefacts
+*.aux
+*.log
+*.out
+*.synctex.gz
+
+# Your personal data. These lines keep it out of git so that a PUBLIC repo never
+# leaks your CV, contact details or application history. If this repository is
+# PRIVATE and you want it backed up, delete the lines below.
+/profile/
+/postings/
+/applications/
+/search/
+/job-hunt.yaml

@@ -1,0 +1,70 @@
+% =====================================================================
+%  COVER LETTER — example for a FICTIONAL person (Alex Sample).
+%  Compile: pdflatex cover-letter.tex   (run twice)
+%
+%  HOW TO TAILOR THIS FILE
+%   1. \cvtitle must match the CV and the posting's exact job title.
+%   2. Fill the recipient block; use the named hiring manager if the
+%      posting gives one, otherwise "Dear Hiring Team,".
+%   3. Three paragraphs, no more, in this order:
+%        P1 — why this company and this role, drawn from the actual ad
+%        P2 — professional match against the posting's real tasks,
+%             closing with one honest gap-acknowledgment sentence
+%        P3 — what you are like as a colleague, grounded in real facts
+%   4. Target 300-380 words of body text. It must stay on one page.
+% =====================================================================
+\documentclass[12pt,a4paper]{article}
+\usepackage{jobcv}
+
+% ------------------------------------------------------------ identity
+\cvname{Alex Sample, M.Sc.}
+\cvtitle{Embedded Systems Engineer}
+\cvlocation{Utrecht, NL}
+\cvphone{+31 6 0000 0000}
+\cvemail{alex.sample@example.com}
+\cvsite{alexsample.example}{https://alexsample.example}
+\cvlinkedin{linkedin.com/in/alex-sample}{https://www.linkedin.com/in/alex-sample/}
+% \cvphoto{headshot.jpg}
+
+\begin{document}
+\pagestyle{empty}
+\makecvheader
+
+% ---------------------------------------------------------- recipient
+\cldate{Utrecht, 10 October 2026}
+
+\clrecipient{%
+Company Name\\
+Hiring Manager Name, Job Title\\
+Street Address\\
+Postcode City, Country}
+
+% ------------------------------------------------------------ subject
+\clsubject{Application: Embedded Systems Engineer}
+
+\clsalutation{Dear Hiring Team,}
+
+\begin{clbody}
+Open with why this company and this role, using specifics from the posting itself rather than
+generic praise. Name the product, the team, or the problem the advertisement actually describes,
+and say what draws you to it. Two or three sentences is enough --- the reader is deciding whether
+to keep reading, not grading your enthusiasm.
+
+Match your experience against the tasks the posting actually lists, in the posting's own
+vocabulary, and ground every claim in something real: a system you built, a number you measured,
+a method you ran. Lead with the closest match rather than the most impressive one. Then close
+this paragraph by naming the one requirement you do not yet meet, plainly and without apology
+--- for example, \enquote{I have not worked with X before, but I have moved into unfamiliar
+technical domains several times and I get productive quickly.} Naming the gap yourself is more
+convincing than hoping it goes unnoticed.
+
+Finish with what you are like to work with, using facts rather than adjectives: teams led,
+people mentored, cross-functional collaborations. If you have a portfolio page, link it once
+here, tied to something you already argued --- for example, the sensor platform is documented
+at \weblink{https://alexsample.example/projects}{alexsample.example/projects}. Close by inviting
+the conversation.
+\end{clbody}
+
+\clclosing{Kind regards,}{Alex Sample}
+
+\end{document}

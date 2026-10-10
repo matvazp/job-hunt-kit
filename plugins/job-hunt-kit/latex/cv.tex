@@ -1,0 +1,99 @@
+% =====================================================================
+%  CV — example for a FICTIONAL person (Alex Sample).
+%  Compile: pdflatex cv.tex   (run twice, for the page counter)
+%
+%  HOW TO TAILOR THIS FILE
+%   1. Set \cvtitle to the exact job title in the posting.
+%   2. Set \cvcountry to the posting's country (required — the build
+%      fails without it; it drives the work-eligibility line).
+%   3. Rewrite the PROFILE paragraph for that role (2-3 lines).
+%   4. Reorder CORE COMPETENCIES so the posting's must-haves appear in
+%      the first two groups; reorder KEY STRENGTHS the same way.
+%   5. Lead PROFESSIONAL EXPERIENCE with the most relevant role.
+%   6. Target two pages (~550-600 extracted words). Going long spills
+%      onto page 3; cut content rather than shrinking the type.
+%   7. Photo is off by default. \cvphoto{headshot.jpg} turns it on.
+% =====================================================================
+\documentclass[12pt,a4paper]{article}
+\usepackage{jobcv}
+
+% ------------------------------------------------------------ identity
+\cvname{Alex Sample, M.Sc.}
+\cvtitle{Embedded Systems Engineer}
+\cvlocation{Utrecht, NL}
+\cvphone{+31 6 0000 0000}
+\cvemail{alex.sample@example.com}
+\cvsite{alexsample.example}{https://alexsample.example}
+\cvlinkedin{linkedin.com/in/alex-sample}{https://www.linkedin.com/in/alex-sample/}
+% \cvphoto{headshot.jpg}
+
+\cvcitizenship{Portuguese}
+\cveligiblein{Netherlands, Portugal, Germany, Belgium, Spain, France}
+\cvcountry{Germany}          % country of THIS posting — build fails if unset
+
+\begin{document}
+\pagestyle{cvrest}\thispagestyle{cvfirst}
+\makecvheader
+
+\cvsection{Profile}
+Embedded systems engineer with six years of firmware and board bring-up for battery-powered
+sensor products, from first prototype to certified volume production. Comfortable owning a
+product's electronics end to end and working across mechanical, software and test teams.
+
+\cvsection{Key Strengths}
+\compactcols{3}{%
+\quality{End-to-end product ownership}
+\quality{Low-power design}
+\quality{Clear documentation}
+\quality{Calm under deadlines}
+\quality{Cross-team collaborator}
+\quality{Data-driven debugging}
+}
+
+\cvsection{Core Competencies}
+\skillgroup{Firmware}{C, C++17, FreeRTOS, Zephyr; STM32, nRF52, ESP32; bootloaders, OTA updates;
+SPI, I\textsuperscript{2}C, UART, BLE, LoRaWAN.}
+
+\skillgroup{Hardware}{Schematic capture and PCB layout in KiCad and Altium Designer; power budgets,
+battery management, EMC pre-compliance.}
+
+\skillgroup{Test \& automation}{Python test fixtures, pytest, hardware-in-the-loop rigs; oscilloscope,
+logic analyser, power profiler; CI with GitHub Actions.}
+
+\skillgroup{Process}{Design reviews, DFM with contract manufacturers, CE/RED certification support,
+Git, Jira.}
+
+\cvsection{Professional Experience}
+\cventry{Senior Embedded Engineer}{Example Sensors B.V., Utrecht, NL}{2022 -- present}
+\begin{cvbullets}
+  \item Owned firmware and electronics for a LoRaWAN soil-moisture sensor shipped to 40,000 sites.
+  \item Cut average current draw from 48~µA to 11~µA, extending battery life from 2 to 7 years.
+  \item Built a Python hardware-in-the-loop rig running 300 regression tests on every merge.
+\end{cvbullets}
+
+\cventry{Embedded Software Engineer}{Fictional Devices Lda., Porto, PT}{2019 -- 2022}
+\begin{cvbullets}
+  \item Developed BLE firmware for a wearable heart-rate monitor through CE certification.
+\end{cvbullets}
+
+\cventry{Graduate Engineer}{Placeholder Automation, Lisbon, PT}{2018 -- 2019}
+\begin{cvbullets}
+  \item Wrote PLC and HMI logic for packaging lines; commissioned three lines on site.
+\end{cvbullets}
+
+\cvsection{Education}
+\eduentrywide{M.Sc., Electrical and Computer Engineering}{University of Example, Porto}{2016 -- 2018}
+\eduentrywide{B.Sc., Electrical Engineering}{University of Example, Porto}{2013 -- 2016}
+
+\cvsection{Languages}
+\langline{{\bfseries English} --- Fluent \textperiodcentered\ {\bfseries Portuguese} --- Native
+\textperiodcentered\ {\bfseries Dutch} --- B1}
+
+\cvsection{At a Glance}
+\compactcols{3}{%
+\quality{2 products to volume production}
+\quality{1 conference paper}
+\quality{\permitline}
+}
+
+\end{document}

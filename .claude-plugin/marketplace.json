@@ -1,0 +1,15 @@
+{
+  "name": "job-hunt-kit",
+  "description": "Job-search skills for Claude Code: job-scout, fit-check, cv-tailor and setup.",
+  "owner": {
+    "name": "Matías Vázquez-Piñón",
+    "url": "https://github.com/matvazp"
+  },
+  "plugins": [
+    {
+      "name": "job-hunt-kit",
+      "source": "./plugins/job-hunt-kit",
+      "description": "Scout live vacancies, score them against your master CV, and tailor ATS-safe CVs and cover letters."
+    }
+  ]
+}
