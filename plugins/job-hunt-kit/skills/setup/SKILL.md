@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Set up or update a job-hunt-kit workspace. Creates the folder structure and settings file (job-hunt.yaml), interviews the user for their contact details, work eligibility, languages and job-search parameters, turns their existing CV(s) into a master CV without inventing anything, generates their search query matrix, and checks that Python and LaTeX are installed. Use when the user wants to start using job-hunt-kit, set up their job search, onboard, or change their profile or search parameters, or when another job-hunt-kit skill finds no job-hunt.yaml.
+description: Set up or update a job-hunt-kit workspace. Creates the folder structure and settings file (job-hunt.yaml), interviews the user for their contact details, work eligibility, languages and job-search parameters, turns their existing CV(s) into a master CV without inventing anything, generates their search query matrix, asks whether they want Word or LaTeX documents, and checks that the tools for that format are installed. Use when the user wants to start using job-hunt-kit, set up their job search, onboard, or change their profile or search parameters, or when another job-hunt-kit skill finds no job-hunt.yaml.
 ---
 
 # Setup
@@ -29,15 +29,24 @@ personal folders.
 
 ## 2. Check prerequisites
 
-Run these and report in one short line each. Don't block on missing tools; explain what each
-one is needed for:
-- `python --version` (or `python3`): needed by job-scout's dedupe script and cv-tailor's build
-  script.
-- `pdflatex --version`: needed to build PDFs. Install TeX Live (tug.org/texlive) or MiKTeX on
-  Windows; on macOS, MacTeX; on Debian/Ubuntu,
-  `sudo apt install texlive-latex-extra texlive-fonts-extra`.
-- Optional: `pdftotext` (poppler) or `pip install pypdf` for word counts and text-extraction
-  checks.
+First ask which **document format** they want (`AskUserQuestion`), and store it as
+`documents.format` in `job-hunt.yaml` once that file exists:
+- **Word (recommended)**: `.docx` files they can edit, plus PDFs. Easiest to install.
+- **LaTeX**: typeset PDFs with a slightly more polished look. Needs a TeX distribution (a large
+  install).
+- **Both**.
+
+Then run the checks for that choice and report in one short line each. Don't block on missing
+tools; explain what each one is needed for and offer to run the install command:
+- `python --version` (or `python3`): always needed (job-scout's dedupe script, cv-tailor's
+  build script).
+- **Word:** `python -c "import docx"`. If it fails: `pip install python-docx`. For PDFs and the
+  page-count check, one of: Microsoft Word (Windows/macOS), or LibreOffice (any OS; free,
+  libreoffice.org). Without either, they still get `.docx` files but must check page counts
+  themselves.
+- **LaTeX:** `pdflatex --version`. Install TeX Live (tug.org/texlive) or MiKTeX on Windows; on
+  macOS, MacTeX; on Debian/Ubuntu, `sudo apt install texlive-latex-extra texlive-fonts-extra`.
+- Optional: `pip install pypdf` (or `pdftotext` from poppler) for page and word counts.
 - Optional: a browser tool (e.g. Claude in Chrome) for capturing full job descriptions from sites
   that need a login.
 
@@ -75,8 +84,8 @@ as you go.
 3. **Languages** and levels, as they'd write them on a CV.
 4. **Portfolio pages** (optional): URLs a cover letter may link to, each with the kind of role it
    suits.
-5. **Document preferences**: paper size (A4 or US Letter), sign-off, the city for the letter date
-   line. Defaults are fine for most people.
+5. **Document preferences**: format (already asked in step 2), paper size (A4 or US Letter),
+   sign-off, the city for the letter date line. Defaults are fine for most people.
 
 ## 5. Build the master CV
 
@@ -121,17 +130,23 @@ Following `${CLAUDE_PLUGIN_ROOT}/skills/job-scout/references/query-matrix-guide.
 sources. Show the category counts and a handful of example queries, especially hidden-match ones,
 and invite edits.
 
-## 8. Verify the LaTeX toolchain (if pdflatex is present)
+## 8. Verify the document toolchain
 
-Build the bundled example once in a temporary folder to confirm the toolchain works:
+Build the bundled fictional example once in a temporary folder, in the chosen format, to confirm
+everything works:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/skills/cv-tailor/scripts/build.py" "<temp folder with copies of ${CLAUDE_PLUGIN_ROOT}/latex/jobcv.sty, cv.tex, cover-letter.tex>"
+# temp folder containing a copy of ${CLAUDE_PLUGIN_ROOT}/examples/example-content.json named content.json
+python "${CLAUDE_PLUGIN_ROOT}/skills/cv-tailor/scripts/build.py" "<temp folder>" --format <documents.format>
 ```
 
-If it fails on a missing package, name the package and the install command for their TeX
-distribution (MiKTeX installs missing packages on first use if allowed). Delete the temp folder
-afterwards.
+- Expected: `cv [...]: OK - pages=2` and `cover-letter [...]: OK - pages=1`.
+- Exit 2 means a tool is missing: install it as in step 2 and rerun.
+- LaTeX failing on a missing package: name the package and the install command for their TeX
+  distribution (MiKTeX installs missing packages on first use if allowed).
+- Word with `pages NOT checked`: works, but no PDF converter was found (step 2).
+
+Offer to open the resulting PDFs so they can see the look. Delete the temp folder afterwards.
 
 ## 9. Finish
 
@@ -142,5 +157,7 @@ Summarise briefly:
   1. `/job-hunt-kit:job-scout`: find today's postings.
   2. `/job-hunt-kit:fit-check`: score and shortlist them.
   3. `/job-hunt-kit:cv-tailor <url>`: tailored CV, cover letter and vacancy note.
-- To change the look of the documents: copy `jobcv.sty` into `latex/` in the workspace and edit
-  it there.
+- To change the look of the documents: copy `${CLAUDE_PLUGIN_ROOT}/word/jobcv-template.docx`
+  (Word) or `${CLAUDE_PLUGIN_ROOT}/latex/jobcv.sty` (LaTeX) into `templates/` in the workspace
+  and edit it there. In Word, modify the styles (keep their names); the text in the template is
+  replaced on every build. Offer to copy the file there now.

@@ -9,7 +9,7 @@ files here; `job-hunt.yaml` tells them where everything is.
    (bare URLs under today's date) and `postings/scouting-log.md` (annotated).
 2. `/job-hunt-kit:fit-check` — score today's postings against the master CV → a ranked table and
    shortlist appended under today's date in the postings list.
-3. `/job-hunt-kit:cv-tailor <posting URL(s)>` — tailored CV + cover letter (PDF, via LaTeX) and a
+3. `/job-hunt-kit:cv-tailor <posting URL(s)>` — tailored CV + cover letter (Word + PDF, or LaTeX PDF, per `documents.format`) and a
    vacancy note with the fit assessment → `applications/YYYYMMDD - Company - Position/`.
 
 ## Ground rules

@@ -4,6 +4,10 @@
 *.out
 *.synctex.gz
 
+# Word lock files and build scratch
+~$*
+_word_pdf/
+
 # Your personal data. These lines keep it out of git so that a PUBLIC repo never
 # leaks your CV, contact details or application history. If this repository is
 # PRIVATE and you want it backed up, delete the lines below.

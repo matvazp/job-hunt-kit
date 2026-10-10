@@ -1,9 +1,14 @@
 # CV & cover letter LaTeX template
 
 A navy-and-black two-page CV and matching one-page cover letter, built to pass ATS
-(applicant tracking system) parsing. `cv-tailor` copies these files into a folder per
-application and fills them in. `cv.tex` and `cover-letter.tex` here are worked examples for
-a fictional person.
+(applicant tracking system) parsing. Used when `documents.format` is `latex` or `both`; the
+Word alternative is in [`../word/`](../word/README.md).
+
+`cv-tailor` doesn't write LaTeX directly. It writes the tailored content to `content.json`,
+and `skills/cv-tailor/scripts/render.py` generates `cv.tex` and `cover-letter.tex` from it,
+using the macros below, and copies `jobcv.sty` into the application folder. `cv.tex` and
+`cover-letter.tex` here are hand-written worked examples for a fictional person, useful if you
+want to write or edit LaTeX yourself (build hand-edited files with `build.py --no-render`).
 
 ## Files
 
@@ -13,7 +18,7 @@ a fictional person.
 | `cv.tex` | Example CV. |
 | `cover-letter.tex` | Example cover letter. |
 
-To customise the look for yourself, copy `jobcv.sty` into your workspace's `latex/` folder.
+To customise the look for yourself, copy `jobcv.sty` into your workspace's `templates/` folder.
 `cv-tailor` uses that copy instead of the bundled one when it exists.
 
 ## Building

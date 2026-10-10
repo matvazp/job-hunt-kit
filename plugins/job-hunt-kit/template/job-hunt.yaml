@@ -48,9 +48,10 @@ paths:
   postings_list: postings/job-postings-list.md
   scouting_log: postings/scouting-log.md
   applications: applications                       # one folder per application
-  latex_override: latex                            # optional: put a custom jobcv.sty here
+  templates: templates                             # optional: your own jobcv-template.docx / jobcv.sty
 
 documents:
+  format: docx                       # docx (Word + PDF), latex (PDF via pdflatex) or both
   paper: a4paper                     # a4paper or letterpaper
   cv_pages: 2
   cv_word_budget: [550, 600]

@@ -2,16 +2,18 @@
 
 A job-search pipeline for [Claude Code](https://code.claude.com). It finds live vacancies that
 match your profile, scores each one against your CV, and writes a tailored two-page CV and
-one-page cover letter for the ones worth applying to. The output is ATS-safe PDFs built from a
-LaTeX template. One rule runs through all of it: **nothing is invented.** Every claim in every
-document traces back to a master CV that you write and control.
+one-page cover letter for the ones worth applying to. You choose the output: **Word documents**
+(editable `.docx` plus PDF, the default) or **LaTeX-typeset PDFs**. Both are ATS-safe. One rule
+runs through all of it: **nothing is invented.** Every claim in every document traces back to a
+master CV that you write and control.
 
 <p align="center">
-  <img src="docs/sample-cv-1.png" width="32%" alt="Sample CV, page 1">
-  <img src="docs/sample-cv-2.png" width="32%" alt="Sample CV, page 2">
-  <img src="docs/sample-cover-letter-1.png" width="32%" alt="Sample cover letter">
+  <img src="docs/sample-word-cv-1.png" width="24%" alt="Sample Word CV, page 1">
+  <img src="docs/sample-word-cover-letter-1.png" width="24%" alt="Sample Word cover letter">
+  <img src="docs/sample-cv-1.png" width="24%" alt="Sample LaTeX CV, page 1">
+  <img src="docs/sample-cover-letter-1.png" width="24%" alt="Sample LaTeX cover letter">
 </p>
-<p align="center"><sub>Sample output for a fictional candidate.</sub></p>
+<p align="center"><sub>The same content for a fictional candidate: Word (left two) and LaTeX (right two).</sub></p>
 
 ## How it works
 
@@ -20,7 +22,7 @@ flowchart LR
     P[("master CV +<br>search parameters")] --> S
     S["<b>job-scout</b><br>search, verify live,<br>dedupe, tier"] -->|today's URLs| F
     F["<b>fit-check</b><br>score 1–10,<br>shortlist"] -->|chosen postings| T
-    T["<b>cv-tailor</b><br>CV + cover letter PDFs,<br>vacancy note"]
+    T["<b>cv-tailor</b><br>CV + cover letter<br>(Word or LaTeX),<br>vacancy note"]
 ```
 
 | Skill | What it does | Writes |
@@ -36,12 +38,19 @@ running the scout.
 ## Requirements
 
 - **Claude Code** with web search/fetch available.
-- **Python 3.9+** (standard library only) for the dedupe and build scripts.
-- **A LaTeX distribution with `pdflatex`**: [TeX Live](https://tug.org/texlive/),
+- **Python 3.9+** for the dedupe and build scripts.
+- For **Word** output (default): `pip install python-docx`, plus Microsoft Word or
+  [LibreOffice](https://www.libreoffice.org/) to make the PDFs and check the page count. Without
+  either you still get `.docx` files.
+- For **LaTeX** output: a distribution with `pdflatex`: [TeX Live](https://tug.org/texlive/),
   [MiKTeX](https://miktex.org/) (Windows) or [MacTeX](https://tug.org/mactex/). On
   Debian/Ubuntu: `sudo apt install texlive-latex-extra texlive-fonts-extra`.
-- Optional: `pdftotext` (poppler) or `pip install pypdf` for word counts, and a browser tool such
-  as Claude in Chrome for capturing full job descriptions from sites that need a login.
+- Optional: `pip install pypdf` (or `pdftotext` from poppler) for page and word counts, and a
+  browser tool such as Claude in Chrome for capturing full job descriptions from sites that need
+  a login.
+
+`setup` asks which format you want, checks what's installed and offers to install what's missing.
+You can switch later with `documents.format` in `job-hunt.yaml` (`docx`, `latex` or `both`).
 
 ## Install
 
@@ -99,21 +108,25 @@ file. Read it and decide where to apply.
 today's shortlist") or paste links. Each posting gets its own
 `applications/YYYYMMDD - Company - Position/` folder:
 
-- `… - CV.pdf`: two pages, ordered so the posting's must-haves come first, with the
-  work-eligibility line set for that country.
-- `… - CL.pdf`: a one-page cover letter.
+- `… - CV.docx` + `… - CV.pdf` (or just the PDF with LaTeX): two pages, ordered so the
+  posting's must-haves come first, with the work-eligibility line set for that country.
+- `… - CL.docx` + `… - CL.pdf`: a one-page cover letter.
 - `vacancy.md`: the fit assessment, the gaps, and the job description copied word for word,
   so you still have it if the ad is taken down.
+- `content.json`: the tailored content both formats are built from.
 
-Review the PDFs, then apply.
+Review the documents, then apply.
 
 **Shortcuts**
 
 - **Skip the scout.** If someone sends you a job link, paste it with "tailor my CV for this"
   and you go straight to step 3.
 - **Login-gated ads.** If a posting can't be fetched, Claude asks you to paste the text.
-- **Edits.** The `.tex` files stay in the application folder, so you can ask "make the profile
-  shorter" or "lead with the IoT role" and the PDFs are rebuilt.
+- **Edits.** Ask "make the profile shorter" or "lead with the IoT role" and Claude updates
+  `content.json` and rebuilds. Or open the `.docx` in Word and polish it yourself. Just ask
+  for any further changes in Word too, since a rebuild replaces the file.
+- **Need the other format?** "Give me the LaTeX version of this one too" rebuilds the same
+  content in the other format.
 
 **Keeping it working well**
 
@@ -140,10 +153,11 @@ postings/
 applications/
   20261010 - Acme - Embedded Engineer/
     vacancy.md                 ← fit assessment + verbatim job description
-    cv.tex, cover-letter.tex, jobcv.sty
-    20261010 - Acme - Embedded Engineer - CV.pdf
-    20261010 - Acme - Embedded Engineer - CL.pdf
-latex/jobcv.sty                ← optional: your own copy, to change the look
+    content.json               ← the tailored content; both formats are built from it
+    20261010 - Acme - Embedded Engineer - CV.docx / .pdf
+    20261010 - Acme - Embedded Engineer - CL.docx / .pdf
+    (LaTeX: cv.tex, cover-letter.tex, jobcv.sty and the two PDFs)
+templates/                     ← optional: your own jobcv-template.docx or jobcv.sty
 ```
 
 Everything is plain Markdown with YAML frontmatter, so it works in any editor, and in
@@ -165,17 +179,33 @@ complete one for a fictional engineer.
   thirty stale ones. Every posting it lists has a publication date inside your window (default
   30 days) and positive evidence that it's still open. Everything it rejects is logged, with the
   reason.
-- **ATS-safe PDFs.** The template avoids the usual text-extraction failures: broken ligatures,
-  letter-spaced headings, icon fonts, tool names split by hyphenation, two-column reading order.
-  Details in [`latex/README.md`](plugins/job-hunt-kit/latex/README.md).
+- **One content file, two formats.** `cv-tailor` writes the tailored text once
+  (`content.json`). Word and LaTeX are just renderers, so the no-invention rule, word budgets and
+  eligibility check are identical whichever you pick, and switching formats never means
+  rewriting.
+- **ATS-safe documents.** Both formats avoid the usual parsing failures. Both: one column, no
+  text boxes or icon fonts, and real text for headings and separators. Word: contact details in
+  the body rather than the page header. LaTeX: also no broken ligatures, letter-spaced headings
+  or tool names split by hyphenation. Details in
+  [`word/README.md`](plugins/job-hunt-kit/word/README.md) and
+  [`latex/README.md`](plugins/job-hunt-kit/latex/README.md).
+- **Page counts are checked, not hoped for.** Every build converts to PDF and checks that the CV
+  is two pages and the letter one. If it runs over, Claude cuts content instead of shrinking the
+  type.
 - **Your work-eligibility line can't silently be wrong.** The CV's "eligible to work in…" line
   is generated from the posting's country and your list of countries. If the country is missing,
   the build fails instead of shipping a CV that names the wrong country.
 
 ## Customising
 
-- **Look and feel:** copy `plugins/job-hunt-kit/latex/jobcv.sty` into your workspace's `latex/`
-  folder and edit it. `cv-tailor` uses your copy when it exists.
+- **Look and feel (Word):** copy
+  [`word/jobcv-template.docx`](plugins/job-hunt-kit/word/jobcv-template.docx) to
+  `templates/jobcv-template.docx` in your workspace, open it in Word and modify the styles
+  (keep their names). No code involved.
+- **Look and feel (LaTeX):** copy `plugins/job-hunt-kit/latex/jobcv.sty` to
+  `templates/jobcv.sty` in your workspace and edit it.
+
+  `cv-tailor` uses your copies when they exist.
 - **Search regions:** `job-scout`'s domain allowlists in
   [`references/sources.md`](plugins/job-hunt-kit/skills/job-scout/references/sources.md) lean
   towards Europe. Other regions work, and the skill builds allowlists as needed. PRs adding

@@ -1,0 +1,112 @@
+{
+  "_comment": "FICTIONAL EXAMPLE (Alex Sample). Schema: skills/cv-tailor/references/content-schema.md",
+  "paper": "a4paper",
+  "identity": {
+    "name": "Alex Sample",
+    "name_with_title": "Alex Sample, M.Sc.",
+    "location": "Utrecht, NL",
+    "phone": "+31 6 0000 0000",
+    "email": "alex.sample@example.com",
+    "website": { "label": "alexsample.example", "url": "https://alexsample.example" },
+    "linkedin": { "label": "linkedin.com/in/alex-sample", "url": "https://www.linkedin.com/in/alex-sample/" },
+    "photo": null
+  },
+  "eligibility": {
+    "citizenship": "Portuguese",
+    "eligible_countries": ["Netherlands", "Portugal", "Germany", "Belgium", "Spain", "France"],
+    "permit_note": "work permit required",
+    "country": "Germany"
+  },
+  "cv": {
+    "title": "Embedded Systems Engineer",
+    "hyphenation_exceptions": ["LoRaWAN", "FreeRTOS"],
+    "sections": [
+      {
+        "type": "paragraph",
+        "heading": "Profile",
+        "text": "Embedded systems engineer with six years of firmware and board bring-up for battery-powered sensor products, from first prototype to certified volume production. Comfortable owning a product's electronics end to end and working across mechanical, software and test teams."
+      },
+      {
+        "type": "qualities",
+        "heading": "Key Strengths",
+        "columns": 3,
+        "items": ["End-to-end product ownership", "Low-power design", "Clear documentation",
+                  "Calm under deadlines", "Cross-team collaborator", "Data-driven debugging"]
+      },
+      {
+        "type": "skills",
+        "heading": "Core Competencies",
+        "groups": [
+          { "label": "Firmware", "text": "C, C++17, FreeRTOS, Zephyr; STM32, nRF52, ESP32; bootloaders, OTA updates; SPI, I²C, UART, BLE, LoRaWAN." },
+          { "label": "Hardware", "text": "Schematic capture and PCB layout in KiCad and Altium Designer; power budgets, battery management, EMC pre-compliance." },
+          { "label": "Test & automation", "text": "Python test fixtures, pytest, hardware-in-the-loop rigs; oscilloscope, logic analyser, power profiler; CI with GitHub Actions." },
+          { "label": "Process", "text": "Design reviews, DFM with contract manufacturers, CE/RED certification support, Git, Jira." }
+        ]
+      },
+      {
+        "type": "experience",
+        "heading": "Professional Experience",
+        "entries": [
+          {
+            "role": "Senior Embedded Engineer",
+            "org": "Example Sensors B.V., Utrecht, NL",
+            "dates": "2022 – present",
+            "bullets": [
+              "Owned firmware and electronics for a LoRaWAN soil-moisture sensor shipped to 40,000 sites.",
+              "Cut average current draw from 48 µA to 11 µA, extending battery life from 2 to 7 years.",
+              "Built a Python hardware-in-the-loop rig running 300 regression tests on every merge."
+            ]
+          },
+          {
+            "role": "Embedded Software Engineer",
+            "org": "Fictional Devices Lda., Porto, PT",
+            "dates": "2019 – 2022",
+            "bullets": ["Developed BLE firmware for a wearable heart-rate monitor through CE certification."]
+          },
+          {
+            "role": "Graduate Engineer",
+            "org": "Placeholder Automation, Lisbon, PT",
+            "dates": "2018 – 2019",
+            "bullets": ["Wrote PLC and HMI logic for packaging lines; commissioned three lines on site."]
+          }
+        ]
+      },
+      {
+        "type": "education",
+        "heading": "Education",
+        "entries": [
+          { "degree": "M.Sc., Electrical and Computer Engineering", "institution": "University of Example, Porto", "dates": "2016 – 2018" },
+          { "degree": "B.Sc., Electrical Engineering", "institution": "University of Example, Porto", "dates": "2013 – 2016" }
+        ]
+      },
+      {
+        "type": "languages",
+        "heading": "Languages",
+        "items": [
+          { "language": "English", "level": "Fluent" },
+          { "language": "Portuguese", "level": "Native" },
+          { "language": "Dutch", "level": "B1" }
+        ]
+      },
+      {
+        "type": "glance",
+        "heading": "At a Glance",
+        "columns": 3,
+        "items": ["2 products to volume production", "1 conference paper"]
+      }
+    ]
+  },
+  "letter": {
+    "date": "Utrecht, 10 October 2026",
+    "recipient": ["Company Name", "Hiring Manager Name, Job Title", "Street Address", "Postcode City, Country"],
+    "subject": "Application: Embedded Systems Engineer",
+    "salutation": "Dear Hiring Team,",
+    "paragraphs": [
+      "Open with why this company and this role, using specifics from the posting itself rather than generic praise. Name the product, the team, or the problem the advertisement actually describes, and say what draws you to it. Two or three sentences is enough: the reader is deciding whether to keep reading, not grading your enthusiasm.",
+      "Match your experience against the tasks the posting actually lists, in the posting's own vocabulary, and ground every claim in something real: a system you built, a number you measured, a method you ran. Lead with the closest match rather than the most impressive one. Then close this paragraph by naming the one requirement you do not yet meet, plainly and without apology, for example: \"I have not worked with X before, but I have moved into unfamiliar technical domains several times and I get productive quickly.\" Naming the gap yourself is more convincing than hoping it goes unnoticed.",
+      "Finish with what you are like to work with, using facts rather than adjectives: teams led, people mentored, cross-functional collaborations. If you have a portfolio page, link it once here, tied to something you already argued; for example, the sensor platform is documented at [alexsample.example/projects](https://alexsample.example/projects). Close by inviting the conversation."
+    ],
+    "sign_off": "Kind regards,",
+    "signature_name": "Alex Sample"
+  }
+}
